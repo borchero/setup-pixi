@@ -82890,21 +82890,21 @@ var import_os3 = require("os");
 var path3 = __toESM(require("path"));
 var io = __toESM(require_io());
 var core4 = __toESM(require_core());
-var executeShellHookBash = (environment) => {
+var executeShellHookBash = ({ environment, tmpPath }) => {
   const pixiCommand = pixiCmd("shell-hook").join(" ");
   const commands = [
-    "jq -n env > ~/.setup-pixi/old-env.json",
+    `jq -n env > ${tmpPath}/old-env.json`,
     `eval $(${pixiCommand} -e ${environment})`,
-    "jq -n env > ~/.setup-pixi/new-env.json"
+    `jq -n env > ${tmpPath}/new-env.json`
   ];
   return execute(["bash", "-c", commands.join(" && ")]);
 };
-var executeShellHookPwsh = (environment) => {
+var executeShellHookPwsh = ({ environment, tmpPath }) => {
   const pixiCommand = pixiCmd("shell-hook").join(" ");
   const commands = [
-    "Get-ChildItem Env:* | ConvertTo-Json | Out-File -FilePath ~\\.setup-pixi\\old-env.json",
+    `Get-ChildItem Env:* | ConvertTo-Json | Out-File -FilePath ${tmpPath}\\old-env.json`,
     `& ${pixiCommand} -e ${environment} | Invoke-Expression`,
-    "Get-ChildItem Env:* | ConvertTo-Json | Out-File -FilePath ~\\.setup-pixi\\new-env.json"
+    `Get-ChildItem Env:* | ConvertTo-Json | Out-File -FilePath ${tmpPath}\\new-env.json`
   ];
   return execute(["powershell.exe", "-Command", commands.join(" ; ")]);
 };
@@ -82938,14 +82938,14 @@ var activateEnvironment = async (environment) => {
   const shell = getDefaultShell();
   switch (shell) {
     case "bash":
-      await executeShellHookBash(environment);
-      oldEnv = parseEnvBash(path3.join(tmpPath, "old-env"));
-      newEnv = parseEnvBash(path3.join(tmpPath, "new-env"));
+      await executeShellHookBash({ environment, tmpPath });
+      oldEnv = parseEnvBash(path3.join(tmpPath, "old-env.json"));
+      newEnv = parseEnvBash(path3.join(tmpPath, "new-env.json"));
       break;
     case "pwsh":
-      await executeShellHookPwsh(environment);
-      oldEnv = parseEnvPwsh(path3.join(tmpPath, "old-env"));
-      newEnv = parseEnvPwsh(path3.join(tmpPath, "new-env"));
+      await executeShellHookPwsh({ environment, tmpPath });
+      oldEnv = parseEnvPwsh(path3.join(tmpPath, "old-env.json"));
+      newEnv = parseEnvPwsh(path3.join(tmpPath, "new-env.json"));
       break;
   }
   const addedPathComponents = getAddedPathComponents(oldEnv.PATH, newEnv.PATH);

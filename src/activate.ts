@@ -10,22 +10,22 @@ type PwshEnvVar = Readonly<{
   Value: string
 }>
 
-const executeShellHookBash = (environment: string): Promise<number> => {
+const executeShellHookBash = ({ environment, tmpPath }: { environment: string; tmpPath: string }): Promise<number> => {
   const pixiCommand = pixiCmd('shell-hook').join(' ')
   const commands = [
-    'jq -n env > ~/.setup-pixi/old-env.json',
+    `jq -n env > ${tmpPath}/old-env.json`,
     `eval $(${pixiCommand} -e ${environment})`,
-    'jq -n env > ~/.setup-pixi/new-env.json'
+    `jq -n env > ${tmpPath}/new-env.json`
   ]
   return execute(['bash', '-c', commands.join(' && ')])
 }
 
-const executeShellHookPwsh = (environment: string): Promise<number> => {
+const executeShellHookPwsh = ({ environment, tmpPath }: { environment: string; tmpPath: string }): Promise<number> => {
   const pixiCommand = pixiCmd('shell-hook').join(' ')
   const commands = [
-    'Get-ChildItem Env:* | ConvertTo-Json | Out-File -FilePath ~\\.setup-pixi\\old-env.json',
+    `Get-ChildItem Env:* | ConvertTo-Json | Out-File -FilePath ${tmpPath}\\old-env.json`,
     `& ${pixiCommand} -e ${environment} | Invoke-Expression`,
-    'Get-ChildItem Env:* | ConvertTo-Json | Out-File -FilePath ~\\.setup-pixi\\new-env.json'
+    `Get-ChildItem Env:* | ConvertTo-Json | Out-File -FilePath ${tmpPath}\\new-env.json`
   ]
   return execute(['powershell.exe', '-Command', commands.join(' ; ')])
 }
@@ -68,14 +68,14 @@ export const activateEnvironment = async (environment: string): Promise<void> =>
   const shell = getDefaultShell()
   switch (shell) {
     case 'bash':
-      await executeShellHookBash(environment)
-      oldEnv = parseEnvBash(path.join(tmpPath, 'old-env'))
-      newEnv = parseEnvBash(path.join(tmpPath, 'new-env'))
+      await executeShellHookBash({ environment, tmpPath })
+      oldEnv = parseEnvBash(path.join(tmpPath, 'old-env.json'))
+      newEnv = parseEnvBash(path.join(tmpPath, 'new-env.json'))
       break
     case 'pwsh':
-      await executeShellHookPwsh(environment)
-      oldEnv = parseEnvPwsh(path.join(tmpPath, 'old-env'))
-      newEnv = parseEnvPwsh(path.join(tmpPath, 'new-env'))
+      await executeShellHookPwsh({ environment, tmpPath })
+      oldEnv = parseEnvPwsh(path.join(tmpPath, 'old-env.json'))
+      newEnv = parseEnvPwsh(path.join(tmpPath, 'new-env.json'))
       break
   }
 
