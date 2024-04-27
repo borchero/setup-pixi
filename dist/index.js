@@ -82916,8 +82916,6 @@ var parseEnvPwsh = (file) => {
   return Object.assign({}, ...raw.map((env) => ({ [env.Key]: env.Value })));
 };
 var getAddedPathComponents = (oldPath, newPath) => {
-  core4.info(oldPath);
-  core4.info(newPath);
   const oldPathComponents = oldPath.split(":");
   const newPathComponents = newPath.split(":");
   return newPathComponents.filter((c) => !oldPathComponents.includes(c));
@@ -82952,7 +82950,7 @@ var activateEnvironment = async (environment) => {
   }
   const addedPathComponents = getAddedPathComponents(oldEnv.PATH, newEnv.PATH);
   const addedEnvVars = getAddedEnvVars(oldEnv, newEnv);
-  for (const path5 in addedPathComponents) {
+  for (const path5 of addedPathComponents) {
     core4.info(`Adding to path: '${path5}'`);
     core4.addPath(path5);
   }

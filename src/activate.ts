@@ -40,8 +40,6 @@ const parseEnvPwsh = (file: string): Record<string, string> => {
 }
 
 const getAddedPathComponents = (oldPath: string, newPath: string): Array<string> => {
-  core.info(oldPath)
-  core.info(newPath)
   const oldPathComponents = oldPath.split(':')
   const newPathComponents = newPath.split(':')
   return newPathComponents.filter((c) => !oldPathComponents.includes(c))
@@ -86,7 +84,7 @@ export const activateEnvironment = async (environment: string): Promise<void> =>
   const addedEnvVars = getAddedEnvVars(oldEnv, newEnv)
 
   // Eventually, we can update our job environment and clean up
-  for (const path in addedPathComponents) {
+  for (const path of addedPathComponents) {
     core.info(`Adding to path: '${path}'`)
     core.addPath(path)
   }
