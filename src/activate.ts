@@ -15,7 +15,7 @@ const executeShellHookBash = (environment: string): Promise<number> => {
     `eval $(${pixiCommand} -e ${environment})`,
     'jq -n env > ~/.setup-pixi/new-env.json'
   ]
-  return execute(['powershell.exe', '-Command', commands.join(' && ')])
+  return execute(['bash', '-c', commands.join(' && ')])
 }
 
 const executeShellHookPwsh = (environment: string): Promise<number> => {
@@ -25,7 +25,7 @@ const executeShellHookPwsh = (environment: string): Promise<number> => {
     `& ${pixiCommand} -e ${environment} | Invoke-Expression`,
     'Get-ChildItem Env:* | ConvertTo-Json | Out-File -FilePath ~\\.setup-pixi\\new-env.json'
   ]
-  return execute(['pwsh', '-c', commands.join(' ; ')])
+  return execute(['powershell.exe', '-Command', commands.join(' ; ')])
 }
 
 const parseEnvBash = (file: string): Record<string, string> => {
