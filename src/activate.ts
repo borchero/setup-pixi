@@ -83,9 +83,11 @@ export const activateEnvironment = async (environment: string): Promise<void> =>
 
   // Eventually, we can update our job environment and clean up
   for (const path in addedPathComponents) {
+    core.info(`Adding to path: '${path}'`)
     core.addPath(path)
   }
   for (const envVar in addedEnvVars) {
+    core.info(`Exporting environment variable: '${envVar}=${addedEnvVars[envVar]}'`)
     core.exportVariable(envVar, addedEnvVars[envVar])
   }
   io.rmRF('~/.setup-pixi')

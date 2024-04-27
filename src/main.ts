@@ -111,7 +111,7 @@ const generateList = async () => {
 
 const generateInfo = () => core.group('pixi info', () => execute(pixiCmd('info')))
 
-const activateEnv = (environment: string) => core.group('activate environment', () => activateEnvironment(environment))
+const activateEnv = (environment: string) => core.group('Activate environment', () => activateEnvironment(environment))
 
 const run = async () => {
   core.debug(`process.env.HOME: ${process.env.HOME}`)
