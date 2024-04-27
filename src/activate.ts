@@ -1,4 +1,6 @@
 import * as fs from 'fs'
+import { homedir } from 'os'
+import * as path from 'path'
 import * as io from '@actions/io'
 import * as core from '@actions/core'
 import { getDefaultShell, execute, pixiCmd } from './util'
@@ -56,9 +58,9 @@ const getAddedEnvVars = (oldEnv: Record<string, string>, newEnv: Record<string, 
 }
 
 export const activateEnvironment = async (environment: string): Promise<void> => {
-  // `~/.setup-pixi` is used to write temporary files for the environment variables. It is
-  // removed later
-  io.mkdirP('~/.setup-pixi')
+  // `~/.setup-pixi` is used to write temporary files for the environment variables. It is removed later
+  const tmpPath = path.join(homedir(), '.setup-pixi')
+  io.mkdirP(tmpPath)
 
   // First, execute the pixi shell hook and record all environment variables prior and after.
   let oldEnv
@@ -67,13 +69,13 @@ export const activateEnvironment = async (environment: string): Promise<void> =>
   switch (shell) {
     case 'bash':
       await executeShellHookBash(environment)
-      oldEnv = parseEnvBash('~/.setup-pixi/old-env')
-      newEnv = parseEnvBash('~/.setup-pixi/new-env')
+      oldEnv = parseEnvBash(path.join(tmpPath, 'old-env'))
+      newEnv = parseEnvBash(path.join(tmpPath, 'new-env'))
       break
     case 'pwsh':
       await executeShellHookPwsh(environment)
-      oldEnv = parseEnvPwsh('~/.setup-pixi/old-env')
-      newEnv = parseEnvPwsh('~/.setup-pixi/new-env')
+      oldEnv = parseEnvPwsh(path.join(tmpPath, 'old-env'))
+      newEnv = parseEnvPwsh(path.join(tmpPath, 'new-env'))
       break
   }
 
@@ -90,5 +92,5 @@ export const activateEnvironment = async (environment: string): Promise<void> =>
     core.info(`Exporting environment variable: '${envVar}=${addedEnvVars[envVar]}'`)
     core.exportVariable(envVar, addedEnvVars[envVar])
   }
-  io.rmRF('~/.setup-pixi')
+  io.rmRF(tmpPath)
 }
