@@ -21,6 +21,19 @@ export const getCondaArch = () => {
   return arch
 }
 
+export const getDefaultShell = () => {
+  const platform = os.platform()
+  switch (platform) {
+    case 'darwin':
+    case 'linux':
+      return 'bash'
+    case 'win32':
+      return 'pwsh'
+    default:
+      throw new Error(`Unsupported architecture: ${platform}`)
+  }
+}
+
 const getPlatform = () => {
   const platform = os.platform()
   switch (platform) {
