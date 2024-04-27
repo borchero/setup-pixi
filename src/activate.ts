@@ -40,6 +40,8 @@ const parseEnvPwsh = (file: string): Record<string, string> => {
 }
 
 const getAddedPathComponents = (oldPath: string, newPath: string): Array<string> => {
+  core.info(oldPath)
+  core.info(newPath)
   const oldPathComponents = oldPath.split(':')
   const newPathComponents = newPath.split(':')
   return newPathComponents.filter((c) => !oldPathComponents.includes(c))

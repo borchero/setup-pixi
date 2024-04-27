@@ -82916,6 +82916,8 @@ var parseEnvPwsh = (file) => {
   return Object.assign({}, ...raw.map((env) => ({ [env.Key]: env.Value })));
 };
 var getAddedPathComponents = (oldPath, newPath) => {
+  core4.info(oldPath);
+  core4.info(newPath);
   const oldPathComponents = oldPath.split(":");
   const newPathComponents = newPath.split(":");
   return newPathComponents.filter((c) => !oldPathComponents.includes(c));
